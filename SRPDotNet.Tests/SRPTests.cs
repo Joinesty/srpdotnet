@@ -34,8 +34,33 @@ namespace SRPDotNet.Tests
             Assert.IsTrue(authentication2.PublicKey.SequenceEqual(authentication1.PublicKey));
         }
 
+
         [TestMethod]
         public void ShouldAuthenticateOnTheServer()
+        {
+            var username = "johndoe";
+            var password = "password1234";
+            var hash = new HMACSHA256();
+            var parameter = new Bit4096();
+            var privateKey = SecureRemoteProtocol.GetRandomNumber();
+            var serverKey = SecureRemoteProtocol.GetRandomNumber();
+
+            var user1 = new User(username, password, hash, parameter, privateKey);
+            var verificationKey1 = user1.CreateVerificationKey();
+            var authentication1 = user1.StartAuthentication();
+
+            var svr1 = new Verifier(hash, parameter, verificationKey1, privateKey, serverKey);
+            var challenge1 = svr1.GetChallenge();
+            var session1 = user1.ProcessChallenge(challenge1);
+            var hamk1 = svr1.VerifiySession(session1);
+
+            user1.VerifySession(hamk1);
+
+            Assert.IsTrue(svr1.IsAuthenticated);
+        }
+
+        [TestMethod]
+        public void ShouldAuthenticateTheSameUserOnTheServer()
         {
             var username = "johndoe";
             var password = "password1234";

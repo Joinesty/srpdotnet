@@ -104,7 +104,7 @@ namespace SRPDotNet
             _parameter = parameter;
 
             _s = verification.Salt.ToBigInteger();
-            _v = verification.PasswordVerifier.ToBigInteger();
+            _v = verification.Verifier.ToBigInteger();
             _username = verification.Username;
 
             _A = A.ToBigInteger();

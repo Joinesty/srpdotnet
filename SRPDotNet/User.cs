@@ -118,7 +118,7 @@ namespace SRPDotNet
             };
 
             var x = Compute_x(v.Salt, _username, _password);
-            v.PasswordVerifier = Compute_v(x.ToBigInteger()).ToByteArray();
+            v.Verifier = Compute_v(x.ToBigInteger()).ToByteArray();
             _verificationKey = v;
             return _verificationKey;
         }

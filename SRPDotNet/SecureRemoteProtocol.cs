@@ -177,7 +177,7 @@ namespace SRPDotNet
         }
 
        
-        public static byte[] GetRandomNumber(int length = 32)
+        public static BigInteger GetRandomNumber(int length = 32)
         {
             var randomData = new byte[length];
 
@@ -186,7 +186,7 @@ namespace SRPDotNet
                 crypto.GetBytes(randomData);
             }
 
-            return randomData;
+            return randomData.ToBigInteger();
         }
 
     }
