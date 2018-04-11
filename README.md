@@ -1,4 +1,4 @@
-# DotSRP
+# SRPDotNet
 ## Secure Remote Protocol for .Net Core
 
 
