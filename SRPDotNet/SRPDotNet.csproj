@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <IsPackable>true</IsPackable>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <PackageVersion>1.0.0.0</PackageVersion>
     <Authors>Elder Santos</Authors>
     <Title>SRPDotNet</Title>
     <Description>A dotnet core implementation for the Secure Remote Protocol</Description>
-    <PackOnBuild>true</PackOnBuild>
+    <PackageLicenseUrl>https://github.com/Joinesty/srpdotnet</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Joinesty/srpdotnet</PackageProjectUrl>
+    <PackageTags>srp security zero knowledge</PackageTags>
+    <Owners>Elder Santos</Owners>
+    <PackageId>SRPDotNet</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
