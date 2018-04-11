@@ -46,14 +46,23 @@ namespace SRPDotNet
 
         }
 
+        public byte[] GetEphemeralSecret()
+        {
+            return _a.ToByteArray();
+        }
+
         public User(string username, string password, HashAlgorithm hashAlgorithm,
-                    SRPParameter parameter, byte[] a) : base(hashAlgorithm, parameter)
+                    SRPParameter parameter, byte[] a = null) : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
             _k = Compute_k().ToBigInteger();
             _username = username;
             _password = password;
+            if(a == null)
+            {
+                a = GetRandomNumber().ToByteArray();
+            }
             _a = a.ToBigInteger();
             _A = Compute_A(_a);
         }
@@ -109,13 +118,19 @@ namespace SRPDotNet
             return authentication;
         }
 
-        public VerificationKey CreateVerificationKey()
+        public VerificationKey CreateVerificationKey(byte[] salt = null)
         {
+            if(salt == null)
+            {
+                salt = GetRandomNumber(32).ToByteArray();
+            }
             var v = new VerificationKey
             {
-                Salt = _a.ToByteArray(),
+                Salt = salt,
                 Username = _username
             };
+
+            _s = v.Salt;
 
             var x = Compute_x(v.Salt, _username, _password);
             v.Verifier = Compute_v(x.ToBigInteger()).ToByteArray();

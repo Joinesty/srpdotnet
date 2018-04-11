@@ -19,14 +19,16 @@ namespace SRPDotNet.Tests
             var password = "password1234";
             var hash = new HMACSHA256();
             var parameter = new Bit4096();
-            var privateKey = SecureRemoteProtocol.GetRandomNumber();
 
-            var user1 = new User(username, password, hash, parameter, privateKey);
+            var user1 = new User(username, password, hash, parameter);
+
+
             var verificationKey1 = user1.CreateVerificationKey();
+            var a = user1.GetEphemeralSecret();
+
             var authentication1 = user1.StartAuthentication();
 
-            var user2 = new User(username, password, hash, parameter, privateKey);
-            var verificationKey2 = user2.CreateVerificationKey();
+            var user2 = new User(username, password, hash, parameter, a);
             var authentication2 = user2.StartAuthentication();
 
             // Make sure a recreated User does all the same appropriate things
@@ -40,13 +42,15 @@ namespace SRPDotNet.Tests
         {
             var username = "johndoe";
             var password = "password1234";
-            var hash = new HMACSHA256();
-            var parameter = new Bit4096();
-            var privateKey = SecureRemoteProtocol.GetRandomNumber();
-            var serverKey = SecureRemoteProtocol.GetRandomNumber();
+            var hash = SHA256.Create();
+            var parameter = new Bit2048();
+            var privateKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
+            var serverKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
 
-            var user1 = new User(username, password, hash, parameter, privateKey);
+            var user1 = new User(username, password, hash, parameter, null);
             var verificationKey1 = user1.CreateVerificationKey();
+            var a = user1.GetEphemeralSecret();
+
             var authentication1 = user1.StartAuthentication();
 
             var svr1 = new Verifier(hash, parameter, verificationKey1, privateKey, serverKey);
@@ -66,8 +70,8 @@ namespace SRPDotNet.Tests
             var password = "password1234";
             var hash = new HMACSHA256();
             var parameter = new Bit4096();
-            var privateKey = SecureRemoteProtocol.GetRandomNumber();
-            var serverKey = SecureRemoteProtocol.GetRandomNumber();
+            var privateKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
+            var serverKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
 
             var user1 = new User(username, password, hash, parameter, privateKey);
             var verificationKey1 = user1.CreateVerificationKey();
