@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PackageVersion>1.0.0.0</PackageVersion>
+    <Authors>Elder Santos</Authors>
+    <Title>SRPDotNet</Title>
+    <Description>A dotnet core implementation for the Secure Remote Protocol</Description>
+    <PackOnBuild>true</PackOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +16,8 @@
     <Folder Include="Parameters\" />
     <Folder Include="Helpers\" />
     <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
   </ItemGroup>
 </Project>

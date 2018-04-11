@@ -16,7 +16,7 @@ namespace SRPDotNet
         bool _isAuthenticated;
         readonly BigInteger _k;
         readonly SRPParameter _parameter;
-        readonly byte[] _A;
+        readonly BigInteger _A;
         readonly BigInteger _b;
         readonly BigInteger _B;
         readonly BigInteger _u;
@@ -24,6 +24,7 @@ namespace SRPDotNet
         readonly byte[] _M;
         readonly byte[] _HMAK;
         readonly VerificationKey _verificationKey;
+        readonly string _username;
 
 
         public bool IsAuthenticated
@@ -47,7 +48,7 @@ namespace SRPDotNet
         {
             VerificationChallenge challenge = new VerificationChallenge();
 
-            if ((_A.ToBigInteger() % _parameter.PrimeNumber) == 0)
+            if ((_A % _parameter.PrimeNumber) == 0)
             {
                 challenge.ServerKey = null;
                 challenge.PublicEphemeralKey = null;
@@ -63,7 +64,7 @@ namespace SRPDotNet
 
         public HAMK VerifiySession(Session session)
         {
-            if (!((_A.ToBigInteger() % _parameter.PrimeNumber) == 0) && (session.Key == _M))
+            if (((_A % _parameter.PrimeNumber) != 0) && (session.Key == _M))
             {
                 _isAuthenticated = true;
                 return new HAMK() { Key = _HMAK };
@@ -92,7 +93,7 @@ namespace SRPDotNet
 
         public string GetUsername()
         {
-            return _verificationKey.Username;
+            return _username;
         }
 
 
@@ -101,17 +102,28 @@ namespace SRPDotNet
         {
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
-            _A = A;
-            _b = b.ToBigInteger();
+
             _s = verification.Salt.ToBigInteger();
             _v = verification.PasswordVerifier.ToBigInteger();
+            _username = verification.Username;
+
+            _A = A.ToBigInteger();
+
+            if ((_A % _parameter.PrimeNumber) == 0) 
+            {
+                throw new Exception("Safety check failed");
+            }
+
+            _b = b.ToBigInteger();
+         
             _k = Compute_k().ToBigInteger();
+
             _B = Compute_B(_v, _k, _b);
-            _u = Compute_u(_A, _B.ToByteArray()).ToBigInteger();
-            _S = Compute_S(_A.ToBigInteger(), _v, _k, _b);
+            _u = Compute_u(_A.ToByteArray(), _B.ToByteArray()).ToBigInteger();
+            _S = Compute_S(_A, _v, _k, _b);
             _K = Compute_K(_S.ToByteArray());
-            _M = Compute_M(verification.Username, verification.Salt, _A, _B.ToByteArray(), _K);
-            _HMAK = Compute_HAMK(_A, _M, _K);
+            _M = Compute_M(_username, _s.ToByteArray(), _A.ToByteArray(), _B.ToByteArray(), _K);
+            _HMAK = Compute_HAMK(_A.ToByteArray(), _M, _K);
             _verificationKey = verification;
         }
 

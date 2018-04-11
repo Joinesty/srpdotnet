@@ -55,8 +55,8 @@ namespace SRPDotNet
         /// <param name="password">Password, this is the P value</param>
         protected byte[] Compute_x(byte[] salt, string username, string password)
         {
-            return HashAlgorithm.ComputeHash(salt.Concat(
-                HashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(username + ":" + password))
+            return _hashAlgorithm.ComputeHash(salt.Concat(
+                _hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(username + ":" + password))
             ).ToArray());
         }
 
@@ -71,8 +71,6 @@ namespace SRPDotNet
         }
 
 
-
-
         /// <summary>
         /// Computes the M H(H(N) XOR H(g) | H(I) | s | A | B | K)
         /// </summary>
@@ -82,24 +80,31 @@ namespace SRPDotNet
         /// <param name="A">A.</param>
         /// <param name="B">B.</param>
         /// <param name="K">K.</param>
-        protected byte[] Compute_M(string username, byte[] salt, byte[] A, byte[] B, byte[] K)
+        protected byte[] Compute_M(string username, byte[] salt, byte[] A,
+                                   byte[] B, byte[] K)
         {
-            byte[] hashPrimeNumber = HashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes());
-            byte[] hashGenerator= HashAlgorithm.ComputeHash(_parameter.Generator.ToBytes());
+            byte[] hashPrimeNumber = _hashAlgorithm.ComputeHash(
+                _parameter.PrimeNumber.ToByteArray());
+            byte[] hashGenerator= _hashAlgorithm.ComputeHash(
+                _parameter.Generator.ToByteArray());
 
             for (int i = 0; i < hashPrimeNumber.Length; i++)
             {
                 hashPrimeNumber[i] ^= hashGenerator[i];
             }
 
-            byte[] hashUsername = HashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(username));
+            byte[] hashUsername = _hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(username));
 
-            return HashAlgorithm.ComputeHash(hashPrimeNumber.Concat(hashUsername).Concat(salt).Concat(A).Concat(B).Concat(K).ToArray());
+            return _hashAlgorithm.ComputeHash(hashPrimeNumber.Concat(hashUsername)
+                                              .Concat(salt)
+                                              .Concat(A)
+                                              .Concat(B)
+                                              .Concat(K).ToArray());
         }
 
         protected byte[] Compute_HAMK(byte[] A, byte[] M, byte[] K)
         {
-            return HashAlgorithm.ComputeHash(A.Concat(M).Concat(K).ToArray());
+            return _hashAlgorithm.ComputeHash(A.Concat(M).Concat(K).ToArray());
         }
 
         /// <summary>
@@ -127,8 +132,9 @@ namespace SRPDotNet
         /// <returns></returns>
         protected byte[] Compute_k()
         {
-            byte[] padded_g = Pad(_parameter.Generator.ToBytes());
-            return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes().Concat(padded_g).ToArray());
+            byte[] padded_g = Pad(_parameter.Generator.ToByteArray());
+            return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToByteArray()
+                                              .Concat(padded_g).ToArray());
         }
 
         /// <summary>
@@ -154,7 +160,9 @@ namespace SRPDotNet
         /// <returns></returns>
         protected BigInteger Compute_B(BigInteger v, BigInteger k, BigInteger b)
         {
-            return (k * v + BigInteger.ModPow(_parameter.Generator, b, _parameter.PrimeNumber)) % _parameter.PrimeNumber;
+            return (k * v + BigInteger.ModPow(
+                _parameter.Generator, b, _parameter.PrimeNumber)
+                   ) % _parameter.PrimeNumber;
         }
 
         /// <summary>
@@ -164,8 +172,8 @@ namespace SRPDotNet
         /// <returns></returns>
         protected byte[] Compute_A(BigInteger a)
         {
-            var A = BigInteger.ModPow(_parameter.Generator, a, _parameter.PrimeNumber);
-            return A.ToBytes();
+            return BigInteger.ModPow(_parameter.Generator, 
+                                     a, _parameter.PrimeNumber).ToByteArray();
         }
 
        

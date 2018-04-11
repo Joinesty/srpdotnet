@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using SRPDotNet.Helpers;
 using SRPDotNet.Parameters;
 using SRPDotNet.Models;
-
+using System;
 
 namespace SRPDotNet
 {
@@ -46,28 +46,19 @@ namespace SRPDotNet
 
         }
 
-        public User(string username, string password, HashAlgorithm hashAlgorithm, SRPParameter parameter, byte[] a) :
-        base(hashAlgorithm, parameter)
+        public User(string username, string password, HashAlgorithm hashAlgorithm,
+                    SRPParameter parameter, byte[] a) : base(hashAlgorithm, parameter)
         {
+            _hashAlgorithm = hashAlgorithm;
+            _parameter = parameter;
             _k = Compute_k().ToBigInteger();
             _username = username;
-            _hashAlgorithm = hashAlgorithm;
-            _A = Compute_A(a.ToBigInteger());
-            _a = a.ToBigInteger();
             _password = password;
-            _parameter = parameter;
+            _a = a.ToBigInteger();
+            _A = Compute_A(_a);
         }
 
 
-
-       /// <summary>
-        /// Computes the S = (A * v^u) ^ b % N 
-       /// </summary>
-       /// <returns>The s.</returns>
-       /// <param name="B">B.</param>
-       /// <param name="v">V.</param>
-       /// <param name="u">U.</param>
-       /// <param name="a">The alpha component.</param>
         BigInteger Compute_S(BigInteger B, BigInteger v, BigInteger u, BigInteger a)
         {
             return BigInteger.ModPow((B - (_k * v )), (a + (u * _x)), _parameter.PrimeNumber);
@@ -82,14 +73,14 @@ namespace SRPDotNet
 
             if (_B % _parameter.PrimeNumber == 0) 
             {
-                return null;
+                throw new Exception("Mod B % PrimeNumber could not be 0");
             }
 
             _u = Compute_u(_A, _B.ToByteArray()).ToBigInteger();
 
             if(_u == 0)
             {
-                return null;
+                throw new Exception("u could not be 0");
             }
 
             _x = Compute_x(_s, _username, _password).ToBigInteger();
@@ -106,7 +97,6 @@ namespace SRPDotNet
 
             return session;
         }
-
 
         public Authentication StartAuthentication()
         {
