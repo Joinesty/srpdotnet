@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace SRPDotNet
 {
-    public class User : SecureRemoteProtocol
+    public class SRPUser : SecureRemoteProtocol
     {
         readonly HashAlgorithm _hashAlgorithm;
         BigInteger _v;
@@ -43,7 +43,7 @@ namespace SRPDotNet
             return _a.ToBytes();
         }
 
-        public User(string username, string password, HashAlgorithm hashAlgorithm,
+        public SRPUser(string username, string password, HashAlgorithm hashAlgorithm,
                     SRPParameter parameter, byte[] a) : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;

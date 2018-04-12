@@ -34,12 +34,12 @@ namespace SRPDotNet.Tests
             var password = "password1234";
             var hash = new HMACSHA256();
             var parameter = new Bit4096();
-            var user1 = new User(username, password, hash, parameter, null);
+            var user1 = new SRPUser(username, password, hash, parameter, null);
 
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
-            var user2 = new User(username, password, hash, parameter, a);
+            var user2 = new SRPUser(username, password, hash, parameter, a);
             var user2Ephemeral = user2.GetEphemeralSecret();
             Assert.IsTrue(a.CheckEquals(user2Ephemeral));
 
@@ -63,18 +63,18 @@ namespace SRPDotNet.Tests
             var serverKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
-            var user1 = new User(username, password, hash, parameter, null);
+            var user1 = new SRPUser(username, password, hash, parameter, null);
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
 
-            var user2 = new User(username, password, hash, parameter, a);
+            var user2 = new SRPUser(username, password, hash, parameter, a);
             var user2Ephemeral = user2.GetEphemeralSecret();
             var authentication2 = user2.StartAuthentication();
 
             Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
 
-            var svr1 = new Verifier(hash, parameter, verificationKey1, 
+            var svr1 = new SRPVerifier(hash, parameter, verificationKey1, 
                                     authentication1.PublicKey, serverKey);
             
             var b = svr1.GetEphemeralSecret();
@@ -97,18 +97,18 @@ namespace SRPDotNet.Tests
             var serverKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
-            var user1 = new User(username, password, hash, parameter, null);
+            var user1 = new SRPUser(username, password, hash, parameter, null);
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
 
-            var user2 = new User(username, password, hash, parameter, a);
+            var user2 = new SRPUser(username, password, hash, parameter, a);
             var user2Ephemeral = user2.GetEphemeralSecret();
             var authentication2 = user2.StartAuthentication();
 
             Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
 
-            var svr1 = new Verifier(hash, parameter, verificationKey1,
+            var svr1 = new SRPVerifier(hash, parameter, verificationKey1,
                                     authentication1.PublicKey, serverKey);
 
             var b = svr1.GetEphemeralSecret();
@@ -120,7 +120,7 @@ namespace SRPDotNet.Tests
             var hamk = svr1.VerifiySession(session1);
 
 
-            var svr2 = new Verifier(hash, parameter, verificationKey1,
+            var svr2 = new SRPVerifier(hash, parameter, verificationKey1,
                                     authentication1.PublicKey, b);
             
             Assert.IsTrue(b.CheckEquals(svr2.GetEphemeralSecret()));

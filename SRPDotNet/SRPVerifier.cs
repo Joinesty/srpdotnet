@@ -7,7 +7,7 @@ using System;
 
 namespace SRPDotNet
 {
-    public class Verifier : SecureRemoteProtocol
+    public class SRPVerifier : SecureRemoteProtocol
     {
         readonly HashAlgorithm _hashAlgorithm;
         readonly BigInteger _s;
@@ -97,7 +97,7 @@ namespace SRPDotNet
         }
 
 
-        public Verifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, 
+        public SRPVerifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, 
                         VerificationKey verification, byte[] A, byte[] b)
             : base(hashAlgorithm, parameter)
         {
