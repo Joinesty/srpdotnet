@@ -47,12 +47,12 @@ namespace SRPDotNet
 
             var v = new VerificationKey
             {
-                Salt = _s,
+                Salt = _s.ByteArrayToString(),
                 Username = username
             };
 
-            var x = Compute_x(v.Salt, username, password);
-            v.Verifier = Compute_v(x.ToBigInteger()).ToBytes();
+            var x = Compute_x(_s, username, password);
+            v.Verifier = Compute_v(x.ToBigInteger()).ToBytes().ByteArrayToString();
             _verificationKey = v;
             return _verificationKey;
         }

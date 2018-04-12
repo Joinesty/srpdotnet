@@ -33,6 +33,24 @@ namespace SRPDotNet.Helpers
             return new BigInteger(data.Reverse().Concat(new byte[] { 0 }).ToArray());
         }
 
+        public static string ByteArrayToString(this byte[] byteArray)
+        {
+            return BitConverter.ToString(byteArray).Replace("-","");
+        }
+
+        public static byte[] StringToByteArray(this string hex)
+        {
+            hex = hex.Replace(" ", "");
+            var numberChars = hex.Length;
+            var bytes = new byte[numberChars / 2];
+            for (int i = 0; i < numberChars; i += 2)
+            {
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            }
+                
+            return bytes;
+        }
+
         public static byte[] ToBytes(this BigInteger value)
         {
             var valueArray = value.ToByteArray();

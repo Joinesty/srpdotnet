@@ -104,8 +104,8 @@ namespace SRPDotNet
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
 
-            _s = verification.Salt.ToBigInteger();
-            _v = verification.Verifier.ToBigInteger();
+            _s = verification.Salt.StringToByteArray().ToBigInteger();
+            _v = verification.Verifier.StringToByteArray().ToBigInteger();
             _username = verification.Username;
 
             _A = A.ToBigInteger();
