@@ -26,7 +26,7 @@ namespace SRPDotNet
         byte[] _s;
         BigInteger _x;
         readonly BigInteger _a;
-        VerificationKey _verificationKey; // s and v
+        //VerificationKey _verificationKey; // s and v
 
 
         public bool IsAuthenticated
@@ -37,22 +37,13 @@ namespace SRPDotNet
             }
         }
 
-        public VerificationKey VerificationKey
-        {
-            get
-            {
-                return _verificationKey;
-            }
-
-        }
-
         public byte[] GetEphemeralSecret()
         {
-            return _a.ToByteArray();
+            return _a.ToBytes();
         }
 
         public User(string username, string password, HashAlgorithm hashAlgorithm,
-                    SRPParameter parameter, byte[] a = null) : base(hashAlgorithm, parameter)
+                    SRPParameter parameter, byte[] a) : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
@@ -61,7 +52,7 @@ namespace SRPDotNet
             _password = password;
             if(a == null)
             {
-                a = GetRandomNumber().ToByteArray();
+                a = GetRandomNumber().ToBytes();
             }
             _a = a.ToBigInteger();
             _A = Compute_A(_a);
@@ -85,7 +76,7 @@ namespace SRPDotNet
                 throw new Exception("Mod B % PrimeNumber could not be 0");
             }
 
-            _u = Compute_u(_A, _B.ToByteArray()).ToBigInteger();
+            _u = Compute_u(_A, _B.ToBytes()).ToBigInteger();
 
             if(_u == 0)
             {
@@ -95,8 +86,8 @@ namespace SRPDotNet
             _x = Compute_x(_s, _username, _password).ToBigInteger();
             _v = Compute_v(_x);
             _S = Compute_S(_B, _v, _u, _a);
-            _K = Compute_K(_S.ToByteArray());
-            _M = Compute_M(_username, _s, _A, _B.ToByteArray(), _K);
+            _K = Compute_K(_S.ToBytes());
+            _M = Compute_M(_username, _s, _A, _B.ToBytes(), _K);
             _HMAK = Compute_HAMK(_A, _M, _K);
 
             var session = new Session()
@@ -118,25 +109,6 @@ namespace SRPDotNet
             return authentication;
         }
 
-        public VerificationKey CreateVerificationKey(byte[] salt = null)
-        {
-            if(salt == null)
-            {
-                salt = GetRandomNumber(32).ToByteArray();
-            }
-            var v = new VerificationKey
-            {
-                Salt = salt,
-                Username = _username
-            };
-
-            _s = v.Salt;
-
-            var x = Compute_x(v.Salt, _username, _password);
-            v.Verifier = Compute_v(x.ToBigInteger()).ToByteArray();
-            _verificationKey = v;
-            return _verificationKey;
-        }
 
         public void VerifySession(HAMK hamk)
         {

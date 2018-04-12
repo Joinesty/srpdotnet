@@ -5,6 +5,9 @@ using SRPDotNet.Parameters;
 using SRPDotNet;
 using System.Linq;
 using SRPDotNet.Models;
+using System.Numerics;
+using SRPDotNet.Helpers;
+
 
 namespace SRPDotNet.Tests
 {
@@ -13,27 +16,32 @@ namespace SRPDotNet.Tests
     {
 
         [TestMethod]
+        public void TestConversions()
+        {
+            var v1 = SecureRemoteProtocol.GetRandomNumber();
+            var v1int = v1.ToBytes();
+            var int2 = v1int;
+            var v2 = int2.ToBigInteger();
+
+            Assert.AreEqual(v1, v2);
+        }
+
+
+        [TestMethod]
         public void ShouldAuthenticateSameUserTwice()
         {
             var username = "johndoe";
             var password = "password1234";
             var hash = new HMACSHA256();
             var parameter = new Bit4096();
+            var user1 = new User(username, password, hash, parameter, null);
 
-            var user1 = new User(username, password, hash, parameter);
-
-
-            var verificationKey1 = user1.CreateVerificationKey();
             var a = user1.GetEphemeralSecret();
-
             var authentication1 = user1.StartAuthentication();
 
             var user2 = new User(username, password, hash, parameter, a);
-            var authentication2 = user2.StartAuthentication();
-
-            // Make sure a recreated User does all the same appropriate things
-            Assert.AreEqual(authentication2.Username, authentication1.Username);
-            Assert.IsTrue(authentication2.PublicKey.SequenceEqual(authentication1.PublicKey));
+            var user2Ephemeral = user2.GetEphemeralSecret();
+            Assert.IsTrue(a.CheckEquals(user2Ephemeral));
         }
 
 
@@ -44,11 +52,13 @@ namespace SRPDotNet.Tests
             var password = "password1234";
             var hash = SHA256.Create();
             var parameter = new Bit2048();
-            var privateKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
-            var serverKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
+            var srp = new SecureRemoteProtocol(hash, parameter);
+            var privateKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
+            var serverKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
+            var verificationKey1 = srp.CreateVerificationKey(username, password);
 
             var user1 = new User(username, password, hash, parameter, null);
-            var verificationKey1 = user1.CreateVerificationKey();
+           
             var a = user1.GetEphemeralSecret();
 
             var authentication1 = user1.StartAuthentication();
@@ -70,15 +80,18 @@ namespace SRPDotNet.Tests
             var password = "password1234";
             var hash = new HMACSHA256();
             var parameter = new Bit4096();
+            var srp = new SecureRemoteProtocol(hash, parameter);
             var privateKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
             var serverKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
 
+            var verificationKey1 = srp.CreateVerificationKey(username, password);
+
             var user1 = new User(username, password, hash, parameter, privateKey);
-            var verificationKey1 = user1.CreateVerificationKey();
+           
             var authentication1 = user1.StartAuthentication();
 
             var user2 = new User(username, password, hash, parameter, privateKey);
-            var verificationKey2 = user2.CreateVerificationKey();
+            var verificationKey2 = srp.CreateVerificationKey(username, password);
             var authentication2 = user2.StartAuthentication();
 
             // Make sure a recreated User does all the same appropriate things

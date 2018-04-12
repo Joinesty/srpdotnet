@@ -41,7 +41,7 @@ namespace SRPDotNet
 
         public byte[] GetEphemeralSecret()
         {
-            return _b.ToByteArray();
+            return _b.ToBytes();
         }
 
         public VerificationChallenge GetChallenge()
@@ -55,8 +55,8 @@ namespace SRPDotNet
             }
             else
             {
-                challenge.ServerKey = _s.ToByteArray();
-                challenge.PublicEphemeralKey = _B.ToByteArray();
+                challenge.ServerKey = _s.ToBytes();
+                challenge.PublicEphemeralKey = _B.ToBytes();
             }
 
             return challenge;
@@ -119,11 +119,11 @@ namespace SRPDotNet
             _k = Compute_k().ToBigInteger();
 
             _B = Compute_B(_v, _k, _b);
-            _u = Compute_u(_A.ToByteArray(), _B.ToByteArray()).ToBigInteger();
+            _u = Compute_u(_A.ToBytes(), _B.ToBytes()).ToBigInteger();
             _S = Compute_S(_A, _v, _k, _b);
-            _K = Compute_K(_S.ToByteArray());
-            _M = Compute_M(_username, _s.ToByteArray(), _A.ToByteArray(), _B.ToByteArray(), _K);
-            _HMAK = Compute_HAMK(_A.ToByteArray(), _M, _K);
+            _K = Compute_K(_S.ToBytes());
+            _M = Compute_M(_username, _s.ToBytes(), _A.ToBytes(), _B.ToBytes(), _K);
+            _HMAK = Compute_HAMK(_A.ToBytes(), _M, _K);
             _verificationKey = verification;
         }
 

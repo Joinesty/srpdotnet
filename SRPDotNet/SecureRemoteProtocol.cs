@@ -4,6 +4,7 @@ using System.Linq;
 using SRPDotNet.Parameters;
 using System.Numerics;
 using SRPDotNet.Helpers;
+using SRPDotNet.Models;
 
 namespace SRPDotNet
 {
@@ -11,6 +12,8 @@ namespace SRPDotNet
     {
         readonly SRPParameter _parameter;
         readonly HashAlgorithm _hashAlgorithm;
+        byte[] _s;
+        VerificationKey _verificationKey;
 
 
         public HashAlgorithm HashAlgorithm
@@ -21,7 +24,7 @@ namespace SRPDotNet
             }
         }
 
-        protected HashAlgorithmName HashAlgorithmName
+        public HashAlgorithmName HashAlgorithmName
         {
             get
             {
@@ -36,6 +39,22 @@ namespace SRPDotNet
             {
                 return _parameter;
             }
+        }
+
+        public VerificationKey CreateVerificationKey(string username, string password)
+        {
+            _s = GetRandomNumber().ToBytes();
+
+            var v = new VerificationKey
+            {
+                Salt = _s,
+                Username = username
+            };
+
+            var x = Compute_x(v.Salt, username, password);
+            v.Verifier = Compute_v(x.ToBigInteger()).ToBytes();
+            _verificationKey = v;
+            return _verificationKey;
         }
 
 
@@ -132,8 +151,8 @@ namespace SRPDotNet
         /// <returns></returns>
         protected byte[] Compute_k()
         {
-            byte[] padded_g = Pad(_parameter.Generator.ToByteArray());
-            return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToByteArray()
+            byte[] padded_g = Pad(_parameter.Generator.ToBytes());
+            return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes()
                                               .Concat(padded_g).ToArray());
         }
 
@@ -173,13 +192,13 @@ namespace SRPDotNet
         protected byte[] Compute_A(BigInteger a)
         {
             return BigInteger.ModPow(_parameter.Generator, 
-                                     a, _parameter.PrimeNumber).ToByteArray();
+                                     a, _parameter.PrimeNumber).ToBytes();
         }
 
-       
-        public static BigInteger GetRandomNumber(int length = 32)
+
+        public static BigInteger GetRandomNumber()
         {
-            var randomData = new byte[length];
+            var randomData = new byte[32];
 
             using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
             {
