@@ -48,7 +48,7 @@ namespace SRPDotNet
         {
             VerificationChallenge challenge = new VerificationChallenge();
 
-            if ((_A % _parameter.PrimeNumber) == 0)
+            if ((_A % _parameter.PrimeNumber) == BigInteger.Zero)
             {
                 challenge.ServerKey = null;
                 challenge.PublicEphemeralKey = null;
@@ -64,7 +64,7 @@ namespace SRPDotNet
 
         public HAMK VerifiySession(Session session)
         {
-            if (((_A % _parameter.PrimeNumber) != 0) && (session.Key == _M))
+            if (((_A % _parameter.PrimeNumber) != BigInteger.Zero) && (session.Key.CheckEquals(_M)))
             {
                 _isAuthenticated = true;
                 return new HAMK() { Key = _HMAK };
@@ -97,7 +97,8 @@ namespace SRPDotNet
         }
 
 
-        public Verifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, VerificationKey verification, byte[] A, byte[] b)
+        public Verifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, 
+                        VerificationKey verification, byte[] A, byte[] b)
             : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
@@ -109,7 +110,7 @@ namespace SRPDotNet
 
             _A = A.ToBigInteger();
 
-            if ((_A % _parameter.PrimeNumber) == 0) 
+            if ((_A % _parameter.PrimeNumber) == BigInteger.Zero) 
             {
                 throw new Exception("Safety check failed");
             }
@@ -125,6 +126,22 @@ namespace SRPDotNet
             _M = Compute_M(_username, _s.ToBytes(), _A.ToBytes(), _B.ToBytes(), _K);
             _HMAK = Compute_HAMK(_A.ToBytes(), _M, _K);
             _verificationKey = verification;
+
+#if DEBUG
+            Console.WriteLine("=================== Verifier ====================");
+            Console.WriteLine("_s = {0}", _s);
+            Console.WriteLine("_v = {0}", _v);
+            Console.WriteLine("_username = {0}", _username);
+            Console.WriteLine("_A = {0}", _A);
+            Console.WriteLine("_b = {0}", _b);
+            Console.WriteLine("_k = {0}", _k);
+            Console.WriteLine("_B = {0}", _B);
+            Console.WriteLine("_u = {0}", _u);
+            Console.WriteLine("_S = {0}", _S);
+            Console.WriteLine("_K = {0}", _K.ToBigInteger());
+            Console.WriteLine("_M = {0}", _M.ToBigInteger());
+            Console.WriteLine("=============================================");
+#endif
         }
 
 

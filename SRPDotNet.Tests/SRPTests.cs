@@ -42,6 +42,12 @@ namespace SRPDotNet.Tests
             var user2 = new User(username, password, hash, parameter, a);
             var user2Ephemeral = user2.GetEphemeralSecret();
             Assert.IsTrue(a.CheckEquals(user2Ephemeral));
+
+            var authentication2 = user2.StartAuthentication();
+
+
+            Assert.AreEqual(authentication1.Username, authentication2.Username);
+            Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
         }
 
 
@@ -50,7 +56,7 @@ namespace SRPDotNet.Tests
         {
             var username = "johndoe";
             var password = "password1234";
-            var hash = SHA256.Create();
+            var hash = new HMACSHA256();
             var parameter = new Bit2048();
             var srp = new SecureRemoteProtocol(hash, parameter);
             var privateKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
@@ -58,19 +64,25 @@ namespace SRPDotNet.Tests
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
             var user1 = new User(username, password, hash, parameter, null);
-           
             var a = user1.GetEphemeralSecret();
-
             var authentication1 = user1.StartAuthentication();
 
-            var svr1 = new Verifier(hash, parameter, verificationKey1, privateKey, serverKey);
+
+            var user2 = new User(username, password, hash, parameter, a);
+            var user2Ephemeral = user2.GetEphemeralSecret();
+            var authentication2 = user2.StartAuthentication();
+
+            Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
+
+            var svr1 = new Verifier(hash, parameter, verificationKey1, 
+                                    authentication1.PublicKey, serverKey);
+            
+            var b = svr1.GetEphemeralSecret();
             var challenge1 = svr1.GetChallenge();
             var session1 = user1.ProcessChallenge(challenge1);
-            var hamk1 = svr1.VerifiySession(session1);
+            var session2 = user2.ProcessChallenge(challenge1);
+            Assert.IsTrue(session1.Key.CheckEquals(session2.Key));
 
-            user1.VerifySession(hamk1);
-
-            Assert.IsTrue(svr1.IsAuthenticated);
         }
 
         [TestMethod]
@@ -79,44 +91,44 @@ namespace SRPDotNet.Tests
             var username = "johndoe";
             var password = "password1234";
             var hash = new HMACSHA256();
-            var parameter = new Bit4096();
+            var parameter = new Bit2048();
             var srp = new SecureRemoteProtocol(hash, parameter);
-            var privateKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
-            var serverKey = SecureRemoteProtocol.GetRandomNumber().ToByteArray();
-
+            var privateKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
+            var serverKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
-            var user1 = new User(username, password, hash, parameter, privateKey);
-           
+            var user1 = new User(username, password, hash, parameter, null);
+            var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
-            var user2 = new User(username, password, hash, parameter, privateKey);
-            var verificationKey2 = srp.CreateVerificationKey(username, password);
+
+            var user2 = new User(username, password, hash, parameter, a);
+            var user2Ephemeral = user2.GetEphemeralSecret();
             var authentication2 = user2.StartAuthentication();
 
-            // Make sure a recreated User does all the same appropriate things
-            Assert.AreEqual(authentication2.Username, authentication1.Username);
-            Assert.IsTrue(authentication2.PublicKey.SequenceEqual(authentication1.PublicKey));
+            Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
 
-            var svr1 = new Verifier(hash, parameter, verificationKey1, privateKey, serverKey);
+            var svr1 = new Verifier(hash, parameter, verificationKey1,
+                                    authentication1.PublicKey, serverKey);
+
+            var b = svr1.GetEphemeralSecret();
             var challenge1 = svr1.GetChallenge();
             var session1 = user1.ProcessChallenge(challenge1);
-            var hamk1 = svr1.VerifiySession(session1);
+            var session2 = user2.ProcessChallenge(challenge1);
+            Assert.IsTrue(session1.Key.CheckEquals(session2.Key));
 
-            //Make sure that a recreated Verifier will authenticate appropriately
-            var svr2 = new Verifier(hash, parameter, verificationKey2, privateKey, serverKey);
-            var challenge2 = svr2.GetChallenge();
-            var session2 = user2.ProcessChallenge(challenge2);
-            var hamk2 = svr2.VerifiySession(session2);
+            var hamk = svr1.VerifiySession(session1);
 
-            Assert.IsTrue(session1.Key.SequenceEqual(session2.Key));
-            Assert.IsTrue(hamk1.Key.SequenceEqual(hamk2.Key));
 
-            user1.VerifySession(hamk1);
-            user2.VerifySession(hamk2);
+            var svr2 = new Verifier(hash, parameter, verificationKey1,
+                                    authentication1.PublicKey, b);
+            
+            Assert.IsTrue(b.CheckEquals(svr2.GetEphemeralSecret()));
 
-            Assert.IsTrue(svr1.IsAuthenticated);
-            //Assert.IsTrue(svr2.IsAuthenticated);
+
+           // var hamk2 = svr2.VerifiySession(session1);
+            //Assert.IsTrue(hash.Key.CheckEquals(hamk2.Key));
+
 
         }
     }

@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPDotNet", "SRPDotNet\SRPD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPDotNet.Tests", "SRPDotNet.Tests\SRPDotNet.Tests.csproj", "{13E86840-2DF9-4884-89F8-30AB9A34CCF0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{52A90AB0-8E38-4115-9F8C-EFF65FC20504}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,5 +21,9 @@ Global
 		{13E86840-2DF9-4884-89F8-30AB9A34CCF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13E86840-2DF9-4884-89F8-30AB9A34CCF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13E86840-2DF9-4884-89F8-30AB9A34CCF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52A90AB0-8E38-4115-9F8C-EFF65FC20504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52A90AB0-8E38-4115-9F8C-EFF65FC20504}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52A90AB0-8E38-4115-9F8C-EFF65FC20504}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52A90AB0-8E38-4115-9F8C-EFF65FC20504}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

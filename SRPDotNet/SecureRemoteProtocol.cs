@@ -103,9 +103,9 @@ namespace SRPDotNet
                                    byte[] B, byte[] K)
         {
             byte[] hashPrimeNumber = _hashAlgorithm.ComputeHash(
-                _parameter.PrimeNumber.ToByteArray());
+                _parameter.PrimeNumber.ToBytes());
             byte[] hashGenerator= _hashAlgorithm.ComputeHash(
-                _parameter.Generator.ToByteArray());
+                _parameter.Generator.ToBytes());
 
             for (int i = 0; i < hashPrimeNumber.Length; i++)
             {

@@ -4,6 +4,7 @@ using SRPDotNet.Helpers;
 using SRPDotNet.Parameters;
 using SRPDotNet.Models;
 using System;
+using System.Diagnostics;
 
 namespace SRPDotNet
 {
@@ -50,18 +51,37 @@ namespace SRPDotNet
             _k = Compute_k().ToBigInteger();
             _username = username;
             _password = password;
-            if(a == null)
+            if (a == null)
             {
                 a = GetRandomNumber().ToBytes();
             }
             _a = a.ToBigInteger();
             _A = Compute_A(_a);
+
+#if DEBUG
+            Console.WriteLine("=================== User ====================");
+            Console.WriteLine("_k = {0}", _k);
+            Console.WriteLine("_a = {0}", _a);
+            Console.WriteLine("_A = {0}", _A.ToBigInteger());
+            Console.WriteLine("=============================================");
+#endif
+
         }
 
 
-        BigInteger Compute_S(BigInteger B, BigInteger v, BigInteger u, BigInteger a)
+        BigInteger Compute_S(BigInteger B, BigInteger k, BigInteger u, BigInteger a, BigInteger x)
         {
-            return BigInteger.ModPow((B - (_k * v )), (a + (u * _x)), _parameter.PrimeNumber);
+            if((B % _parameter.PrimeNumber) == BigInteger.Zero)
+            {
+                throw new Exception("B mod N == 0");
+            }
+
+            var v = BigInteger.ModPow(_parameter.Generator, x, _parameter.PrimeNumber);
+
+            //return BigInteger.ModPow(B + (_parameter.PrimeNumber - (k * v) % _parameter.PrimeNumber),
+            //a + u * x, _parameter.PrimeNumber);
+
+            return BigInteger.ModPow((B - k * v), (a + u * x), _parameter.PrimeNumber);
         }
 
 
@@ -85,7 +105,7 @@ namespace SRPDotNet
 
             _x = Compute_x(_s, _username, _password).ToBigInteger();
             _v = Compute_v(_x);
-            _S = Compute_S(_B, _v, _u, _a);
+            _S = Compute_S(_B, _k, _u, _a, _x);
             _K = Compute_K(_S.ToBytes());
             _M = Compute_M(_username, _s, _A, _B.ToBytes(), _K);
             _HMAK = Compute_HAMK(_A, _M, _K);
@@ -94,6 +114,20 @@ namespace SRPDotNet
             {
                 Key = _M
             };
+
+
+            #if DEBUG
+            Console.WriteLine("=================== User Challenge====================");
+            Console.WriteLine("_s = {0}", _s.ToBigInteger());
+            Console.WriteLine("_B = {0}", _B);
+            Console.WriteLine("_u = {0}", _u);
+            Console.WriteLine("_x = {0}", _x);
+            Console.WriteLine("_v = {0}", _v);
+            Console.WriteLine("_S = {0}", _S);
+            Console.WriteLine("_K = {0}", _K.ToBigInteger());
+            Console.WriteLine("_M = {0}", _M.ToBigInteger());
+            Console.WriteLine("=============================================");
+#endif
 
             return session;
         }
