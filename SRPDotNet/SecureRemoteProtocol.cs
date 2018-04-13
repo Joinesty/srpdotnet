@@ -52,7 +52,7 @@ namespace SRPDotNet
             };
 
             var x = Compute_x(_s, username, password);
-            v.Verifier = Compute_v(x.ToBigInteger()).ToBytes().ByteArrayToString();
+            v.Verifier = BigInteger.ModPow(_parameter.Generator, x.ToBigInteger(), _parameter.PrimeNumber).ToBytes().ByteArrayToString();
             _verificationKey = v;
             return _verificationKey;
         }
@@ -64,6 +64,7 @@ namespace SRPDotNet
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
         }
+
 
         /// <summary>
         /// x = H(s | H(I | ":" | P))
@@ -78,17 +79,9 @@ namespace SRPDotNet
                 _hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(username + ":" + password))
             ).ToArray());
         }
+       
 
-        /// <summary>
-        /// v = g^x % N
-        /// </summary>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        protected BigInteger Compute_v(BigInteger x)
-        {
-            return BigInteger.ModPow(_parameter.Generator, x, _parameter.PrimeNumber);
-        }
-
+       
 
         /// <summary>
         /// Computes the M H(H(N) XOR H(g) | H(I) | s | A | B | K)
@@ -136,14 +129,12 @@ namespace SRPDotNet
             return _hashAlgorithm.ComputeHash(S);
         }
 
-
-        byte[] Pad(byte[] value)
-        {
-            var result = new byte[_parameter.KeyLength / 8];
-            value.CopyTo(result, result.Length - value.Length);
-            return result;
-        }
-
+        //protected byte[] Pad(byte[] value)
+        //{
+         //   var result = new byte[_parameter.KeyLength / 8];
+          //  value.CopyTo(result, result.Length - value.Length);
+          //  return result;
+        //}
 
         /// <summary>
         /// k = H(N | PAD(g))
@@ -151,23 +142,23 @@ namespace SRPDotNet
         /// <returns></returns>
         protected byte[] Compute_k()
         {
-            byte[] padded_g = Pad(_parameter.Generator.ToBytes());
+            //byte[] padded_g = Pad();
             return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes()
-                                              .Concat(padded_g).ToArray());
+                                              .Concat(_parameter.Generator.ToBytes()).ToArray());
         }
 
-        /// <summary>
-        /// u = H(PAD(A) | PAD(B))
-        /// </summary>
-        /// <param name="A"></param>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        protected byte[] Compute_u(byte[] A, byte[] B)
-        {
-            byte[] paddedA = Pad(A);
-            byte[] paddedB = Pad(B);
-            return _hashAlgorithm.ComputeHash(paddedA.Concat(paddedB).ToArray());
-        }
+
+
+
+
+
+        //protected byte[] Compute_u(byte[] N, byte[] A, byte[] B)
+        //{
+          //  var head = N.Length - A.Length;
+            //var middle = N.Length - B.Length;
+
+            //return _hashAlgorithm.ComputeHash(paddedA.Concat(paddedB).ToArray());
+        //}
 
 
         /// <summary>
@@ -177,23 +168,14 @@ namespace SRPDotNet
         /// <param name="k"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        protected BigInteger Compute_B(BigInteger v, BigInteger k, BigInteger b)
-        {
-            return (k * v + BigInteger.ModPow(
-                _parameter.Generator, b, _parameter.PrimeNumber)
-                   ) % _parameter.PrimeNumber;
-        }
+        //protected BigInteger Compute_B(BigInteger v, BigInteger k, BigInteger b)
+        //{
+         //   return (k * v + BigInteger.ModPow(
+          //      _parameter.Generator, b, _parameter.PrimeNumber)
+           //        ) % _parameter.PrimeNumber;
+       // }
 
-        /// <summary>
-        /// A = g^a % N
-        /// </summary>
-        /// <param name="a"></param>
-        /// <returns></returns>
-        protected byte[] Compute_A(BigInteger a)
-        {
-            return BigInteger.ModPow(_parameter.Generator, 
-                                     a, _parameter.PrimeNumber).ToBytes();
-        }
+       
 
 
         public static BigInteger GetRandomNumber()

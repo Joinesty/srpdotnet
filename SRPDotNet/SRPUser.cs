@@ -4,7 +4,8 @@ using SRPDotNet.Helpers;
 using SRPDotNet.Parameters;
 using SRPDotNet.Models;
 using System;
-using System.Diagnostics;
+using System.Linq;
+using System.Text;
 
 namespace SRPDotNet
 {
@@ -27,7 +28,6 @@ namespace SRPDotNet
         byte[] _s;
         BigInteger _x;
         readonly BigInteger _a;
-        //VerificationKey _verificationKey; // s and v
 
 
         public bool IsAuthenticated
@@ -44,7 +44,7 @@ namespace SRPDotNet
         }
 
         public SRPUser(string username, string password, HashAlgorithm hashAlgorithm,
-                    SRPParameter parameter, byte[] a) : base(hashAlgorithm, parameter)
+                       SRPParameter parameter, byte[] a) : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
@@ -76,15 +76,72 @@ namespace SRPDotNet
                 throw new Exception("B mod N == 0");
             }
 
-            var v = BigInteger.ModPow(_parameter.Generator, x, _parameter.PrimeNumber);
-
             //return BigInteger.ModPow(B + (_parameter.PrimeNumber - (k * v) % _parameter.PrimeNumber),
             //a + u * x, _parameter.PrimeNumber);
 
-            return BigInteger.ModPow((B - k * v), (a + u * x), _parameter.PrimeNumber);
+            return BigInteger.ModPow((B - k * _v), (a + u * x), _parameter.PrimeNumber);
+        }
+
+        /// <summary>
+        /// A = g^a % N
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        byte[] Compute_A(BigInteger a)
+        {
+            return BigInteger.ModPow(_parameter.Generator,
+                                     a, _parameter.PrimeNumber).ToBytes();
         }
 
 
+        public Session ProcessChallenge(byte[]  bytes_s, byte[] bytes_B)
+        {
+
+            _s = bytes_s;
+            _B = bytes_B.ToBigInteger();
+
+            if (_B % _parameter.PrimeNumber == 0)
+            {
+                throw new Exception("Mod B % PrimeNumber could not be 0");
+            }
+
+            _u = _hashAlgorithm.ComputeHash(_A.Concat(_B.ToBytes()).ToArray()).ToBigInteger();
+
+            if (_u == 0)
+            {
+                throw new Exception("u could not be 0");
+            }
+
+            _x = Compute_x(_s, _username, _password).ToBigInteger();
+            _v = BigInteger.ModPow(_parameter.Generator, _x, _parameter.PrimeNumber);
+            _S = Compute_S(_B, _k, _u, _a, _x);
+            _K = Compute_K(_S.ToBytes());
+            _M = Compute_M(_username, _s, _A, _B.ToBytes(), _K);
+            _HMAK = Compute_HAMK(_A, _M, _K);
+
+            var session = new Session()
+            {
+                Key = _M
+            };
+
+
+#if DEBUG
+            Console.WriteLine("=================== User Challenge====================");
+            Console.WriteLine("_s = {0}", _s.ToBigInteger());
+            Console.WriteLine("_B = {0}", _B);
+            Console.WriteLine("_u = {0}", _u);
+            Console.WriteLine("_x = {0}", _x);
+            Console.WriteLine("_v = {0}", _v);
+            Console.WriteLine("_S = {0}", _S);
+            Console.WriteLine("_K = {0}", _K.ToBigInteger());
+            Console.WriteLine("_M = {0}", _M.ToBigInteger());
+            Console.WriteLine("=============================================");
+#endif
+
+            return session;
+        }
+
+      
         public Session ProcessChallenge(VerificationChallenge challenge)
         {
             
@@ -95,8 +152,9 @@ namespace SRPDotNet
             {
                 throw new Exception("Mod B % PrimeNumber could not be 0");
             }
+            _u = _hashAlgorithm.ComputeHash(_A.Concat(_B.ToBytes()).ToArray()).ToBigInteger();
 
-            _u = Compute_u(_A, _B.ToBytes()).ToBigInteger();
+            //_u = Compute_u(_A, _B.ToBytes()).ToBigInteger();
 
             if(_u == 0)
             {
@@ -104,7 +162,7 @@ namespace SRPDotNet
             }
 
             _x = Compute_x(_s, _username, _password).ToBigInteger();
-            _v = Compute_v(_x);
+            _v = BigInteger.ModPow(_parameter.Generator, _x, _parameter.PrimeNumber);
             _S = Compute_S(_B, _k, _u, _a, _x);
             _K = Compute_K(_S.ToBytes());
             _M = Compute_M(_username, _s, _A, _B.ToBytes(), _K);
@@ -117,11 +175,14 @@ namespace SRPDotNet
 
 
             #if DEBUG
-            Console.WriteLine("=================== User Challenge====================");
+            Console.WriteLine("================ User Challenge ==============");
             Console.WriteLine("_s = {0}", _s.ToBigInteger());
             Console.WriteLine("_B = {0}", _B);
+            Console.WriteLine("_A = {0}", _A.ToBigInteger());
+            Console.WriteLine("_a = {0}", _a);
             Console.WriteLine("_u = {0}", _u);
             Console.WriteLine("_x = {0}", _x);
+            Console.WriteLine("_k = {0}", _k);
             Console.WriteLine("_v = {0}", _v);
             Console.WriteLine("_S = {0}", _S);
             Console.WriteLine("_K = {0}", _K.ToBigInteger());

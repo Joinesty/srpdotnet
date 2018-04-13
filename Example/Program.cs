@@ -28,12 +28,12 @@ namespace Example
 
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
-            var user1 = new SRPUser(username, password, hash, parameter, null);
+            var user1 = new SRPUser(username, password, hash, parameter);
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
             var svr1 = new SRPVerifier(hash, parameter, verificationKey1,
-                                    authentication1.PublicKey, serverKey);
+                                    authentication1.PublicKey);
 
             var b = svr1.GetEphemeralSecret();
             var challenge1 = svr1.GetChallenge();

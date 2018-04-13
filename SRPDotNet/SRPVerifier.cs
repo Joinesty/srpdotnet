@@ -4,6 +4,7 @@ using SRPDotNet.Models;
 using SRPDotNet.Helpers;
 using System.Security.Cryptography;
 using System;
+using System.Linq;
 
 namespace SRPDotNet
 {
@@ -64,12 +65,13 @@ namespace SRPDotNet
 
         public HAMK VerifiySession(Session session)
         {
+            HAMK hamk = null;
             if (((_A % _parameter.PrimeNumber) != BigInteger.Zero) && (session.Key.CheckEquals(_M)))
             {
                 _isAuthenticated = true;
-                return new HAMK() { Key = _HMAK };
+                hamk =  new HAMK() { Key = _HMAK };
             }
-            return null;
+            return hamk;
         }
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace SRPDotNet
 
 
         public SRPVerifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, 
-                        VerificationKey verification, byte[] A, byte[] b)
+                           VerificationKey verification, byte[] A, byte[] b)
             : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
@@ -115,13 +117,22 @@ namespace SRPDotNet
                 throw new Exception("Safety check failed");
             }
 
+            if (b == null)
+            {
+                b = GetRandomNumber().ToBytes();
+            }
+
             _b = b.ToBigInteger();
          
             _k = Compute_k().ToBigInteger();
 
-            _B = Compute_B(_v, _k, _b);
+            _B = (_k * _v + BigInteger.ModPow(
+                _parameter.Generator, _b, _parameter.PrimeNumber)
+                   ) % _parameter.PrimeNumber;
+        
+           // _B = Compute_B(_v, _k, _b);
             _u = Compute_u(_A.ToBytes(), _B.ToBytes()).ToBigInteger();
-            _S = Compute_S(_A, _v, _k, _b);
+            _S = Compute_S(_A, _v, _u, _b);
             _K = Compute_K(_S.ToBytes());
             _M = Compute_M(_username, _s.ToBytes(), _A.ToBytes(), _B.ToBytes(), _K);
             _HMAK = Compute_HAMK(_A.ToBytes(), _M, _K);
@@ -142,10 +153,20 @@ namespace SRPDotNet
             Console.WriteLine("_M = {0}", _M.ToBigInteger());
             Console.WriteLine("=============================================");
 #endif
+
         }
 
-
-      
-       
+        /// <summary>
+        /// u = H(PAD(A) | PAD(B))
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <returns></returns>
+        byte[] Compute_u(byte[] A, byte[] B)
+        {
+            //byte[] paddedA = Pad(A);
+            //byte[] paddedB = Pad(B);
+            return _hashAlgorithm.ComputeHash(A.Concat(B).ToArray());
+        }
     }
 }
