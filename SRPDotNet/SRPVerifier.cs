@@ -100,7 +100,7 @@ namespace SRPDotNet
 
 
         public SRPVerifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, 
-                           VerificationKey verification, byte[] A, byte[] b)
+                           VerificationKey verification, byte[] A)
             : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
@@ -117,12 +117,12 @@ namespace SRPDotNet
                 throw new Exception("Safety check failed");
             }
 
-            if (b == null)
-            {
-                b = GetRandomNumber().ToBytes();
-            }
+           // if (b == null)
+            //{
+              //  b = GetRandomNumber().ToBytes();
+            //}
 
-            _b = b.ToBigInteger();
+            _b = GetRandomNumber();
          
             _k = Compute_k().ToBigInteger();
 
