@@ -30,7 +30,7 @@ namespace SRPDotNet.Tests
         public void ShouldWork()
         {
             var username = "johndoe";
-            var password = "password1234";
+            var password = "password";
             var hash = new HMACSHA256();
             var parameter = new Bit2048();
             var srp = new SecureRemoteProtocol(hash, parameter);
@@ -55,7 +55,6 @@ namespace SRPDotNet.Tests
 
         }
 
-        /*
 
 
         [TestMethod]
@@ -64,22 +63,22 @@ namespace SRPDotNet.Tests
             var username = "johndoe";
             var password = "password1234";
             var hash = new HMACSHA256();
-            var parameter = new Bit4096();
-            var user1 = new SRPUser(username, password, hash, parameter, null);
+            var parameter = new Bit2048();
+            var user1 = new SRPUser(username, password, hash, parameter);
 
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
-            var user2 = new SRPUser(username, password, hash, parameter, a);
+            var user2 = new SRPUser(username, password, hash, parameter);
             var user2Ephemeral = user2.GetEphemeralSecret();
             Assert.IsTrue(a.CheckEquals(user2Ephemeral));
 
             var authentication2 = user2.StartAuthentication();
 
-
             Assert.AreEqual(authentication1.Username, authentication2.Username);
             Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
         }
+
 
 
         [TestMethod]
@@ -94,19 +93,19 @@ namespace SRPDotNet.Tests
             var serverKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
-            var user1 = new SRPUser(username, password, hash, parameter, null);
+            var user1 = new SRPUser(username, password, hash, parameter);
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
 
-            var user2 = new SRPUser(username, password, hash, parameter, a);
+            var user2 = new SRPUser(username, password, hash, parameter);
             var user2Ephemeral = user2.GetEphemeralSecret();
             var authentication2 = user2.StartAuthentication();
 
             Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
 
             var svr1 = new SRPVerifier(hash, parameter, verificationKey1, 
-                                       authentication1.PublicKey, serverKey);
+                                       authentication1.PublicKey);
             
             var b = svr1.GetEphemeralSecret();
             var challenge1 = svr1.GetChallenge();
@@ -131,19 +130,19 @@ namespace SRPDotNet.Tests
             var serverKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
             var verificationKey1 = srp.CreateVerificationKey(username, password);
 
-            var user1 = new SRPUser(username, password, hash, parameter, null);
+            var user1 = new SRPUser(username, password, hash, parameter);
             var a = user1.GetEphemeralSecret();
             var authentication1 = user1.StartAuthentication();
 
 
-            var user2 = new SRPUser(username, password, hash, parameter, a);
+            var user2 = new SRPUser(username, password, hash, parameter);
             var user2Ephemeral = user2.GetEphemeralSecret();
             var authentication2 = user2.StartAuthentication();
 
             Assert.IsTrue(authentication1.PublicKey.CheckEquals(authentication2.PublicKey));
 
             var svr1 = new SRPVerifier(hash, parameter, verificationKey1,
-                                    authentication1.PublicKey, null);
+                                    authentication1.PublicKey);
 
             var b = svr1.GetEphemeralSecret();
             var challenge1 = svr1.GetChallenge();
@@ -155,7 +154,7 @@ namespace SRPDotNet.Tests
 
 
             var svr2 = new SRPVerifier(hash, parameter, verificationKey1,
-                                    authentication1.PublicKey, b);
+                                    authentication1.PublicKey);
             
             Assert.IsTrue(b.CheckEquals(svr2.GetEphemeralSecret()));
 
@@ -165,6 +164,6 @@ namespace SRPDotNet.Tests
 
 
         }
-        */
+
     }
 }

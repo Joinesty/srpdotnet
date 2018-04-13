@@ -55,7 +55,8 @@ namespace SRPDotNet
             //{
               //  a = GetRandomNumber().ToBytes();
             //}
-            _a = GetRandomNumber();
+            //_a = GetRandomNumber();
+            _a = BigInteger.Parse("74236667825352264527273219564547312472100561501249972990525296015972193477642");
             _A = Compute_A(_a);
 
 #if DEBUG

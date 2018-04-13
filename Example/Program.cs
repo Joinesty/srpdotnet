@@ -19,7 +19,7 @@ namespace Example
         {
             
             var username = "johndoe";
-            var password = "password1234";
+            var password = "password";
             var hash = new HMACSHA256();
             var parameter = new Bit2048();
             var srp = new SecureRemoteProtocol(hash, parameter);
