@@ -129,12 +129,12 @@ namespace SRPDotNet
             return _hashAlgorithm.ComputeHash(S);
         }
 
-        //protected byte[] Pad(byte[] value)
-        //{
-         //   var result = new byte[_parameter.KeyLength / 8];
-          //  value.CopyTo(result, result.Length - value.Length);
-          //  return result;
-        //}
+        protected byte[] Pad(byte[] value)
+        {
+            var result = new byte[_parameter.KeyLength / 8];
+            value.CopyTo(result, result.Length - value.Length);
+            return result;
+        }
 
         /// <summary>
         /// k = H(N | PAD(g))
@@ -142,14 +142,10 @@ namespace SRPDotNet
         /// <returns></returns>
         protected byte[] Compute_k()
         {
-            //byte[] padded_g = Pad();
+            byte[] padded_g = Pad(_parameter.Generator.ToBytes());
             return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes()
-                                              .Concat(_parameter.Generator.ToBytes()).ToArray());
+                                              .Concat(padded_g).ToArray());
         }
-
-
-
-
 
 
         //protected byte[] Compute_u(byte[] N, byte[] A, byte[] B)
