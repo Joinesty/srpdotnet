@@ -14,7 +14,7 @@ namespace SRPDotNet.Helpers
             return source.SequenceEqual(target);
         }
 
-        public static byte[] ToByteArray(this string hexString)
+        public static byte[] ToBytes(this string hexString)
         {
             hexString = hexString.Replace(" ", "");
             int numberChars = hexString.Length;
@@ -28,17 +28,7 @@ namespace SRPDotNet.Helpers
             return bytes;
         }
 
-        public static BigInteger ToBigInteger(this byte[] data)
-        {
-            return new BigInteger(data.Reverse().Concat(new byte[] { 0 }).ToArray());
-        }
-
-        public static string ByteArrayToString(this byte[] byteArray)
-        {
-            return BitConverter.ToString(byteArray).Replace("-","");
-        }
-
-        public static byte[] StringToByteArray(this string hex)
+        public static byte[] StringToBytes(this string hex)
         {
             hex = hex.Replace(" ", "");
             var numberChars = hex.Length;
@@ -47,9 +37,21 @@ namespace SRPDotNet.Helpers
             {
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             }
-                
+
             return bytes;
         }
+
+        public static BigInteger ToBigInteger(this byte[] data)
+        {
+            return new BigInteger(data.Reverse().Concat(new byte[] { 0 }).ToArray());
+        }
+
+        public static string BytesToString(this byte[] byteArray)
+        {
+            return BitConverter.ToString(byteArray).Replace("-","");
+        }
+
+     
 
         public static byte[] ToBytes(this BigInteger value)
         {

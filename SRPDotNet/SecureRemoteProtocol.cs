@@ -43,18 +43,27 @@ namespace SRPDotNet
 
         public VerificationKey CreateVerificationKey(string username, string password)
         {
-            _s = GetRandomNumber().ToBytes();
+            _s = "A0AE7ED4898CBE1927CD5B3877516CFAF59F35EB43940B3640D44F2C86C38CD2".StringToBytes();//GetRandomNumber().ToBytes();
 
             var v = new VerificationKey
             {
-                Salt = _s.ByteArrayToString(),
+                Salt = _s.BytesToString(),
                 Username = username
             };
 
             var x = Compute_x(_s, username, password);
-            v.Verifier = BigInteger.ModPow(_parameter.Generator, x.ToBigInteger(), _parameter.PrimeNumber).ToBytes().ByteArrayToString();
+
+            v.Verifier = BigInteger.ModPow(_parameter.Generator, x.ToBigInteger(), _parameter.PrimeNumber).ToBytes().BytesToString();
             _verificationKey = v;
             return _verificationKey;
+        }
+
+        public BigInteger Pow(BigInteger value, BigInteger exponent)
+        {
+            BigInteger originalValue = value;
+            while (exponent-- > 1)
+                value = BigInteger.Multiply(value, originalValue);
+            return value;
         }
 
 
@@ -131,9 +140,10 @@ namespace SRPDotNet
 
         protected byte[] Pad(byte[] value)
         {
-            var result = new byte[_parameter.KeyLength / 8];
+            return value;
+            /*var result = new byte[_parameter.KeyLength / 8];
             value.CopyTo(result, result.Length - value.Length);
-            return result;
+            return result;*/
         }
 
         /// <summary>

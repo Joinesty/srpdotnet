@@ -48,8 +48,8 @@ namespace SRPDotNet.Parameters
 
         protected SRPParameter(byte[] primeNumber, byte[] generator, int keyLength, int saltLength)
         {
-            _primeNumber = new BigInteger(primeNumber);
-            _generator = new BigInteger(generator);
+            _primeNumber = primeNumber.ToBigInteger();
+            _generator = generator.ToBigInteger();
             _keyLength = keyLength;
             _saltLength = saltLength;
         }

@@ -16,7 +16,7 @@ namespace SRPDotNet.Parameters
                                             "5EA77A27 75D2ECFA 032CFBDB F52FB378 61602790 04E57AE6 AF874E73" +
                                             "03CE5329 9CCC041C 7BC308D8 2A5698F3 A8D0C382 71AE35F8 E9DBFBB6" +
                                             "94B5C803 D89F7AE4 35DE236D 525F5475 9B65E372 FCD68EF2 0FA7111F" +
-                                             "9E4AFF73").ToByteArray();
+                                             "9E4AFF73").ToBytes();
 
         static readonly byte[] _generator = new byte[] { 2 } ;
 

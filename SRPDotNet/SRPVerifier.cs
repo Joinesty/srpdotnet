@@ -106,8 +106,8 @@ namespace SRPDotNet
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
 
-            _s = verification.Salt.StringToByteArray().ToBigInteger();
-            _v = verification.Verifier.StringToByteArray().ToBigInteger();
+            _s = verification.Salt.StringToBytes().ToBigInteger();
+            _v = verification.Verifier.StringToBytes().ToBigInteger();
             _username = verification.Username;
 
             _A = A.ToBigInteger();
@@ -159,9 +159,9 @@ namespace SRPDotNet
         /// <returns></returns>
         byte[] Compute_u(byte[] A, byte[] B)
         {
-            //byte[] paddedA = Pad(A);
-            //byte[] paddedB = Pad(B);
-            return _hashAlgorithm.ComputeHash(A.Concat(B).ToArray());
+            byte[] paddedA = Pad(A);
+            byte[] paddedB = Pad(B);
+            return _hashAlgorithm.ComputeHash(paddedA.Concat(paddedB).ToArray());
         }
     }
 }
