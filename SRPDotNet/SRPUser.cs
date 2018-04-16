@@ -116,8 +116,8 @@ namespace SRPDotNet
                 throw new Exception("Mod B % PrimeNumber could not be 0");
             }
 
-            var __A = Pad(_A);
-            var __B = Pad(_B.ToBytes());
+            var __A = _A;
+            var __B = _B.ToBytes();
 
             _u = _hashAlgorithm.ComputeHash(__A.Concat(__B).ToArray()).ToBigInteger();
 

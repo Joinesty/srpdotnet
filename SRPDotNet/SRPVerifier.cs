@@ -159,8 +159,8 @@ namespace SRPDotNet
         /// <returns></returns>
         byte[] Compute_u(byte[] A, byte[] B)
         {
-            byte[] paddedA = Pad(A);
-            byte[] paddedB = Pad(B);
+            byte[] paddedA = A;
+            byte[] paddedB = B;
             return _hashAlgorithm.ComputeHash(paddedA.Concat(paddedB).ToArray());
         }
     }

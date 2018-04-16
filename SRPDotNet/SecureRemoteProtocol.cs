@@ -138,21 +138,13 @@ namespace SRPDotNet
             return _hashAlgorithm.ComputeHash(S);
         }
 
-        protected byte[] Pad(byte[] value)
-        {
-            return value;
-            /*var result = new byte[_parameter.KeyLength / 8];
-            value.CopyTo(result, result.Length - value.Length);
-            return result;*/
-        }
-
         /// <summary>
         /// k = H(N | PAD(g))
         /// </summary>
         /// <returns></returns>
         protected byte[] Compute_k()
         {
-            byte[] padded_g = Pad(_parameter.Generator.ToBytes());
+            byte[] padded_g = _parameter.Generator.ToBytes();
             return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes()
                                               .Concat(padded_g).ToArray());
         }
