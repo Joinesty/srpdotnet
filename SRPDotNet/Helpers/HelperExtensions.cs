@@ -43,8 +43,6 @@ namespace SRPDotNet.Helpers
             return BitConverter.ToString(byteArray).Replace("-","");
         }
 
-     
-
         public static byte[] ToBytes(this BigInteger value)
         {
             var valueArray = value.ToByteArray();
