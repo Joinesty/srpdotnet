@@ -117,12 +117,6 @@ namespace SRPDotNet
                 throw new Exception("Safety check failed");
             }
 
-           // if (b == null)
-            //{
-              //  b = GetRandomNumber().ToBytes();
-            //}
-
-            //_b = GetRandomNumber();
             _b = BigInteger.Parse("6120781328594294848119626246127827602386035851539447828004723105537643674485");
          
             _k = Compute_k().ToBigInteger();

@@ -1,10 +1,10 @@
 ﻿using System.Security.Cryptography;
-using System.Text;
-using System.Linq;
 using SRPDotNet.Parameters;
-using System.Numerics;
 using SRPDotNet.Helpers;
 using SRPDotNet.Models;
+using System.Numerics;
+using System.Linq;
+using System.Text;
 
 namespace SRPDotNet
 {
@@ -146,32 +146,6 @@ namespace SRPDotNet
             return _hashAlgorithm.ComputeHash(_parameter.PrimeNumber.ToBytes()
                                               .Concat(padded_g).ToArray());
         }
-
-
-        //protected byte[] Compute_u(byte[] N, byte[] A, byte[] B)
-        //{
-          //  var head = N.Length - A.Length;
-            //var middle = N.Length - B.Length;
-
-            //return _hashAlgorithm.ComputeHash(paddedA.Concat(paddedB).ToArray());
-        //}
-
-
-        /// <summary>
-        /// B = k*v + g^b % N
-        /// </summary>
-        /// <param name="v"></param>
-        /// <param name="k"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        //protected BigInteger Compute_B(BigInteger v, BigInteger k, BigInteger b)
-        //{
-         //   return (k * v + BigInteger.ModPow(
-          //      _parameter.Generator, b, _parameter.PrimeNumber)
-           //        ) % _parameter.PrimeNumber;
-       // }
-
-       
 
 
         public static BigInteger GetRandomNumber()
