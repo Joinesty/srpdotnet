@@ -5,6 +5,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Xml;
 
+
 namespace SRPDotNet.Helpers
 {
     public static class HelperExtensions
@@ -14,19 +15,13 @@ namespace SRPDotNet.Helpers
             return source.SequenceEqual(target);
         }
 
+
         public static byte[] ToByteArray(this string hexString)
         {
             hexString = hexString.Replace(" ", "");
-            int numberChars = hexString.Length;
-
-            var bytes = new byte[numberChars / 2];
-            for (int i = 0; i < numberChars; i += 2)
-            {
-                bytes[i / 2] = Convert.ToByte(hexString.Substring(i, 2), 16);
-            }
-
-            return bytes;
+            return hexString.Select(item => Convert.ToByte(item.ToString(), 16)).ToArray();
         }
+
 
         public static BigInteger ToBigInteger(this byte[] data)
         {

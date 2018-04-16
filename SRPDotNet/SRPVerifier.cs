@@ -66,7 +66,7 @@ namespace SRPDotNet
         public HAMK VerifiySession(Session session)
         {
             HAMK hamk = null;
-            if (((_A % _parameter.PrimeNumber) != BigInteger.Zero) && (session.Key.CheckEquals(_M)))
+            if (((_A % _parameter.PrimeNumber) != BigInteger.Zero) && (session.Key.ByteArrayToString().Equals(_M.ByteArrayToString())))
             {
                 _isAuthenticated = true;
                 hamk =  new HAMK() { Key = _HMAK };
