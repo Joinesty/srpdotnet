@@ -51,11 +51,6 @@ namespace SRPDotNet
             _k = Compute_k().ToBigInteger();
             _username = username;
             _password = password;
-            //if (a == null)
-            //{
-              //  a = GetRandomNumber().ToBytes();
-            //}
-            //_a = GetRandomNumber();
             _a = BigInteger.Parse("74236667825352264527273219564547312472100561501249972990525296015972193477642");
             _A = Compute_A(_a);
 
@@ -77,21 +72,8 @@ namespace SRPDotNet
                 throw new Exception("B mod N == 0");
             }
 
-
-
-
             return BigInteger.ModPow(B + (_parameter.PrimeNumber - (k * _v) % _parameter.PrimeNumber),
             a + u * x, _parameter.PrimeNumber);
-
-            //var res = k * _v;
-
-            //if(res.Sign == BigInteger.MinusOne)
-            //{
-               // res = BigInteger.Multiply(res, BigInteger.MinusOne);
-           // }
-
-
-            //return BigInteger.ModPow((B - res), (a + u * x), _parameter.PrimeNumber);
         }
 
         /// <summary>
