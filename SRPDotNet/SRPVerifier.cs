@@ -125,7 +125,6 @@ namespace SRPDotNet
                 _parameter.Generator, _b, _parameter.PrimeNumber)
                    ) % _parameter.PrimeNumber;
         
-           // _B = Compute_B(_v, _k, _b);
             _u = Compute_u(_A.ToBytes(), _B.ToBytes()).ToBigInteger();
             _S = Compute_S(_A, _v, _u, _b);
             _K = Compute_K(_S.ToBytes());
