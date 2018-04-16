@@ -18,7 +18,7 @@ namespace SRPDotNet.Parameters
                                             "94B5C803 D89F7AE4 35DE236D 525F5475 9B65E372 FCD68EF2 0FA7111F" +
                                              "9E4AFF73").ToByteArray();
 
-        static readonly byte[] _generator = Encoding.UTF8.GetBytes("2");
+        static readonly byte[] _generator = new byte[] { 2 } ;
 
 
         public Bit2048() : base(_hexaPrime, _generator, 2048) { }

@@ -21,7 +21,7 @@ namespace SRPDotNet.Parameters
                                             "BBE11757 7A615D6C 770988C0 BAD946E2 08E24FA0 74E5AB31 43DB5BFC" +
                                              "E0FD108E 4B82D120 A93AD2CA FFFFFFFF FFFFFFFF").ToByteArray();
 
-        static readonly byte[] _generator = Encoding.UTF8.GetBytes("5");
+        static readonly byte[] _generator = new byte[] { 5 };
 
 
         public Bit3072() : base(_hexaPrime, _generator, 3072) { }
