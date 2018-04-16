@@ -18,8 +18,7 @@ namespace SRPDotNet.Helpers
 
         public static byte[] ToByteArray(this string hexString)
         {
-            hexString = hexString.Replace(" ", "");
-            return hexString.Select(item => Convert.ToByte(item.ToString(), 16)).ToArray();
+            return StringToByteArray(hexString);
         }
 
 
