@@ -100,7 +100,7 @@ namespace SRPDotNet
 
 
         public SRPVerifier(HashAlgorithm hashAlgorithm, SRPParameter parameter, 
-                           VerificationKey verification, byte[] A)
+                           VerificationKey verification, byte[] A, byte[] b = null)
             : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
@@ -117,7 +117,7 @@ namespace SRPDotNet
                 throw new Exception("Safety check failed");
             }
 
-            _b = BigInteger.Parse("6120781328594294848119626246127827602386035851539447828004723105537643674485");
+            _b = b != null ? b.ToBigInteger() : GetRandomNumber().ToBytes().ToBigInteger();
          
             _k = Compute_k().ToBigInteger();
 
