@@ -5,6 +5,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Xml;
 
+
 namespace SRPDotNet.Helpers
 {
     public static class HelperExtensions
@@ -14,15 +15,19 @@ namespace SRPDotNet.Helpers
             return source.SequenceEqual(target);
         }
 
-        public static byte[] ToByteArray(this string hexString)
+        public static byte[] ToBytes(this string hexString)
         {
-            hexString = hexString.Replace(" ", "");
-            int numberChars = hexString.Length;
+            return StringToBytes(hexString);
+        }
 
+        public static byte[] StringToBytes(this string hex)
+        {
+            hex = hex.Replace(" ", "");
+            var numberChars = hex.Length;
             var bytes = new byte[numberChars / 2];
             for (int i = 0; i < numberChars; i += 2)
             {
-                bytes[i / 2] = Convert.ToByte(hexString.Substring(i, 2), 16);
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             }
 
             return bytes;
@@ -33,22 +38,9 @@ namespace SRPDotNet.Helpers
             return new BigInteger(data.Reverse().Concat(new byte[] { 0 }).ToArray());
         }
 
-        public static string ByteArrayToString(this byte[] byteArray)
+        public static string BytesToString(this byte[] byteArray)
         {
             return BitConverter.ToString(byteArray).Replace("-","");
-        }
-
-        public static byte[] StringToByteArray(this string hex)
-        {
-            hex = hex.Replace(" ", "");
-            var numberChars = hex.Length;
-            var bytes = new byte[numberChars / 2];
-            for (int i = 0; i < numberChars; i += 2)
-            {
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            }
-                
-            return bytes;
         }
 
         public static byte[] ToBytes(this BigInteger value)

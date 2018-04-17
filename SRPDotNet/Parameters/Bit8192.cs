@@ -43,9 +43,9 @@ namespace SRPDotNet.Parameters
                                             "0846851DF9AB48195DED7EA1B1D510BD7EE74D73FAF36BC31ECFA268" +
                                             "359046F4EB879F924009438B481C6CD7889A002ED5EE382BC9190DA6" +
                                             "FC026E479558E4475677E9AA9E3050E2765694DFC81F56E880B96E71" +
-                                             "60C980DD98EDD3DFFFFFFFFFFFFFFFFF").ToByteArray();
+                                             "60C980DD98EDD3DFFFFFFFFFFFFFFFFF").ToBytes();
 
-        static readonly byte[] _generator = Encoding.UTF8.GetBytes("19");
+        static readonly byte[] _generator = new byte[] { 19 };
 
 
         public Bit8192() : base(_hexaPrime, _generator, 8192) { }

@@ -20,7 +20,7 @@ namespace Example
             
             var username = "johndoe";
             var password = "password";
-            var hash = new HMACSHA256();
+            var hash = SHA256.Create();
             var parameter = new Bit2048();
             var srp = new SecureRemoteProtocol(hash, parameter);
             var privateKey = SecureRemoteProtocol.GetRandomNumber().ToBytes();
