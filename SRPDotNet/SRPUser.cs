@@ -44,14 +44,14 @@ namespace SRPDotNet
         }
 
         public SRPUser(string username, string password, HashAlgorithm hashAlgorithm,
-                       SRPParameter parameter) : base(hashAlgorithm, parameter)
+                       SRPParameter parameter, byte [] a = null) : base(hashAlgorithm, parameter)
         {
             _hashAlgorithm = hashAlgorithm;
             _parameter = parameter;
             _k = Compute_k().ToBigInteger();
             _username = username;
             _password = password;
-            _a = BigInteger.Parse("74236667825352264527273219564547312472100561501249972990525296015972193477642");
+            _a = a != null ? a.ToBigInteger() : GetRandomNumber().ToBytes().ToBigInteger();
             _A = Compute_A(_a);
 
 #if DEBUG
